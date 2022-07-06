@@ -2,8 +2,10 @@ local usingElevator = false
 local elevators = {}
 local nearbyElevators = {}
 
-local MenuPool = NativeUI.CreatePool()
-local ElevatorMenu = nil
+local menuPool = NativeUI.CreatePool()
+local menuPosition = {x = 1420, y = 0} -- Left-aligned menu
+--local menuPosition = {x = 1420, y = 0} -- Right-aligned menu
+local elevatorMenu = nil
 
 
 RegisterNetEvent("n2_elevators:SendElevators", function(pElevators)
@@ -32,17 +34,17 @@ local function UseElevator(coords)
     Wait(600)
     PlaySoundFrontend(-1, "FAKE_ARRIVE", "MP_PROPERTIES_ELEVATOR_DOORS", true)
     usingElevator = false
-    if ElevatorMenu ~= nil then
-        ElevatorMenu:Visible(false)
-        ElevatorMenu:Clear()
-        ElevatorMenu = nil
+    if elevatorMenu ~= nil then
+        elevatorMenu:Visible(false)
+        elevatorMenu:Clear()
+        elevatorMenu = nil
     end
 end
 
 local function OpenElevatorMenu(elevatorId, floorId)
     usingElevator = true
-    ElevatorMenu = NativeUI.CreateMenu("Elevator", elevators[elevatorId].label)
-    MenuPool:Add(ElevatorMenu)
+    elevatorMenu = NativeUI.CreateMenu("Elevator", elevators[elevatorId].label, menuPosition.x, menuPosition.y)
+    menuPool:Add(elevatorMenu)
     
     
     for k, v in pairs(elevators[elevatorId].locations) do
@@ -57,14 +59,14 @@ local function OpenElevatorMenu(elevatorId, floorId)
             item:Enabled(false)
             item:SetRightBadge(21)
         end
-        ElevatorMenu:AddItem(item)
+        elevatorMenu:AddItem(item)
     end
     
-    MenuPool:RefreshIndex()
-    ElevatorMenu:Visible(true)
-    ElevatorMenu:CurrentSelection(floorId-1)
+    menuPool:RefreshIndex()
+    elevatorMenu:Visible(true)
+    elevatorMenu:CurrentSelection(floorId-1)
     
-    ElevatorMenu.OnItemSelect = function(_, _, index)
+    elevatorMenu.OnItemSelect = function(_, _, index)
         UseElevator(elevators[elevatorId].locations[index].dest)
     end
     
@@ -74,10 +76,10 @@ local function OpenElevatorMenu(elevatorId, floorId)
             local pedCoords = GetEntityCoords(PlayerPedId())
             if (#(elevators[elevatorId].locations[floorId].dest.xyz - pedCoords) > 2) then
                 usingElevator = false
-                if ElevatorMenu ~= nil then
-                    ElevatorMenu:Visible(false)
-                    ElevatorMenu:Clear()
-                    ElevatorMenu = nil
+                if elevatorMenu ~= nil then
+                    elevatorMenu:Visible(false)
+                    elevatorMenu:Clear()
+                    elevatorMenu = nil
                 end
             end
         end
@@ -127,17 +129,17 @@ end)
 CreateThread(function()
     while true do
         Wait(0)
-        MenuPool:MouseControlsEnabled(false)
-        MenuPool:MouseEdgeEnabled(false)
-        MenuPool:ControlDisablingEnabled(false)
-        MenuPool:ProcessMenus()
+        menuPool:MouseControlsEnabled(false)
+        menuPool:MouseEdgeEnabled(false)
+        menuPool:ControlDisablingEnabled(false)
+        menuPool:ProcessMenus()
         
         if usingElevator then
-            if ElevatorMenu ~= nil then
-                if ElevatorMenu:Visible() == false then
+            if elevatorMenu ~= nil then
+                if elevatorMenu:Visible() == false then
                     usingElevator = false
-                    ElevatorMenu:Clear()
-                    ElevatorMenu = nil
+                    elevatorMenu:Clear()
+                    elevatorMenu = nil
                 end
             end
         end
