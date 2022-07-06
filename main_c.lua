@@ -43,7 +43,7 @@ local function OpenElevatorMenu(elevatorId, floorId)
     usingElevator = true
     ElevatorMenu = NativeUI.CreateMenu("Elevator", elevators[elevatorId].label)
     MenuPool:Add(ElevatorMenu)
-   
+    
     
     for k, v in pairs(elevators[elevatorId].locations) do
         local label = v.label
@@ -67,16 +67,18 @@ local function OpenElevatorMenu(elevatorId, floorId)
     ElevatorMenu.OnItemSelect = function(_, _, index)
         UseElevator(elevators[elevatorId].locations[index].dest)
     end
-
+    
     CreateThread(function()
         while usingElevator do
             Wait(250)
             local pedCoords = GetEntityCoords(PlayerPedId())
             if (#(elevators[elevatorId].locations[floorId].dest.xyz - pedCoords) > 2) then
                 usingElevator = false
-                ElevatorMenu:Visible(false)
-                ElevatorMenu:Clear()
-                ElevatorMenu = nil
+                if ElevatorMenu ~= nil then
+                    ElevatorMenu:Visible(false)
+                    ElevatorMenu:Clear()
+                    ElevatorMenu = nil
+                end
             end
         end
     end)
@@ -129,12 +131,14 @@ CreateThread(function()
         MenuPool:MouseEdgeEnabled(false)
         MenuPool:ControlDisablingEnabled(false)
         MenuPool:ProcessMenus()
-       
+        
         if usingElevator then
-            if ElevatorMenu:Visible() == false then
-                usingElevator = false
-                ElevatorMenu:Clear()
-                ElevatorMenu = nil
+            if ElevatorMenu ~= nil then
+                if ElevatorMenu:Visible() == false then
+                    usingElevator = false
+                    ElevatorMenu:Clear()
+                    ElevatorMenu = nil
+                end
             end
         end
     end
