@@ -3,7 +3,7 @@ local elevators = {}
 local nearbyElevators = {}
 
 local menuPool = NativeUI.CreatePool()
-local menuPosition = {x = 1420, y = 0} -- Left-aligned menu
+local menuPosition = {x = 0, y = 0} -- Left-aligned menu
 --local menuPosition = {x = 1420, y = 0} -- Right-aligned menu
 local elevatorMenu = nil
 
