@@ -34,6 +34,7 @@ local function UseElevator(coords)
     usingElevator = false
     if ElevatorMenu ~= nil then
         ElevatorMenu:Visible(false)
+        ElevatorMenu:Clear()
         ElevatorMenu = nil
     end
 end
@@ -42,6 +43,7 @@ local function OpenElevatorMenu(elevatorId, floorId)
     usingElevator = true
     ElevatorMenu = NativeUI.CreateMenu("Elevator", elevators[elevatorId].label)
     MenuPool:Add(ElevatorMenu)
+   
     
     for k, v in pairs(elevators[elevatorId].locations) do
         local label = v.label
@@ -60,6 +62,7 @@ local function OpenElevatorMenu(elevatorId, floorId)
     
     MenuPool:RefreshIndex()
     ElevatorMenu:Visible(true)
+    ElevatorMenu:CurrentSelection(floorId-1)
     
     ElevatorMenu.OnItemSelect = function(_, _, index)
         UseElevator(elevators[elevatorId].locations[index].dest)
@@ -72,6 +75,7 @@ local function OpenElevatorMenu(elevatorId, floorId)
             if (#(elevators[elevatorId].locations[floorId].dest.xyz - pedCoords) > 2) then
                 usingElevator = false
                 ElevatorMenu:Visible(false)
+                ElevatorMenu:Clear()
                 ElevatorMenu = nil
             end
         end
@@ -121,13 +125,15 @@ end)
 CreateThread(function()
     while true do
         Wait(0)
-        MenuPool:ProcessMenus()
         MenuPool:MouseControlsEnabled(false)
         MenuPool:MouseEdgeEnabled(false)
         MenuPool:ControlDisablingEnabled(false)
+        MenuPool:ProcessMenus()
+       
         if usingElevator then
             if ElevatorMenu:Visible() == false then
                 usingElevator = false
+                ElevatorMenu:Clear()
                 ElevatorMenu = nil
             end
         end
