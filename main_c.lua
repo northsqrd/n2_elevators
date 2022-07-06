@@ -32,8 +32,10 @@ local function UseElevator(coords)
     Wait(600)
     PlaySoundFrontend(-1, "FAKE_ARRIVE", "MP_PROPERTIES_ELEVATOR_DOORS", true)
     usingElevator = false
-    ElevatorMenu:Visible(false)
-    ElevatorMenu = nil
+    if ElevatorMenu ~= nil then
+        ElevatorMenu:Visible(false)
+        ElevatorMenu = nil
+    end
 end
 
 local function OpenElevatorMenu(elevatorId, floorId)
