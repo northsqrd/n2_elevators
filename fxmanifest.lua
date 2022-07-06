@@ -3,7 +3,11 @@ game 'gta5'
 
 author 'northsqrd'
 
-client_script 'main_c.lua'
+client_scripts {
+    "@NativeUI/NativeUI.lua",
+    'main_c.lua'
+}
+
 server_scripts {
     'config_s.lua',
     'main_s.lua',
