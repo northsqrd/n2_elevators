@@ -5,10 +5,8 @@ author 'northsqrd'
 
 client_scripts {
     "@NativeUI/NativeUI.lua",
+    'config_c.lua',
     'main_c.lua'
 }
 
-server_scripts {
-    'config_s.lua',
-    'main_s.lua',
-}
+server_script 'main_s.lua'

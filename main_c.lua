@@ -1,16 +1,8 @@
 local usingElevator = false
-local elevators = {}
 local nearbyElevators = {}
 
 local menuPool = NativeUI.CreatePool()
-local menuPosition = {x = 0, y = 0} -- Left-aligned menu
---local menuPosition = {x = 1420, y = 0} -- Right-aligned menu
 local elevatorMenu = nil
-
-
-RegisterNetEvent("n2_elevators:SendElevators", function(pElevators)
-    elevators = pElevators
-end)
 
 local function DisplayHelpText(text, playSound)
     SetTextComponentFormat("STRING")
@@ -41,10 +33,10 @@ end
 
 local function OpenElevatorMenu(elevatorId, floorId)
     usingElevator = true
-    elevatorMenu = NativeUI.CreateMenu("Elevator", elevators[elevatorId].label, menuPosition.x, menuPosition.y)
+    elevatorMenu = NativeUI.CreateMenu("Elevator", Config.Elevators[elevatorId].label, Config.MenuPositions[Config.MenuPosition].x, Config.MenuPositions[Config.MenuPosition].y)
     menuPool:Add(elevatorMenu)
 
-    for k, v in pairs(elevators[elevatorId].locations) do
+    for k, v in pairs(Config.Elevators[elevatorId].locations) do
         local label = v.label
 
         if k == floorId then
@@ -64,14 +56,14 @@ local function OpenElevatorMenu(elevatorId, floorId)
     elevatorMenu:CurrentSelection(floorId-1)
 
     elevatorMenu.OnItemSelect = function(_, _, index)
-        UseElevator(elevators[elevatorId].locations[index].dest)
+        UseElevator(Config.Elevators[elevatorId].locations[index].dest)
     end
 
     CreateThread(function()
         while usingElevator do
             Wait(250)
             local pedCoords = GetEntityCoords(PlayerPedId())
-            if (#(elevators[elevatorId].locations[floorId].dest.xyz - pedCoords) > 2) then
+            if (#(Config.Elevators[elevatorId].locations[floorId].dest.xyz - pedCoords) > 2) then
                 usingElevator = false
                 if elevatorMenu ~= nil then
                     elevatorMenu:Visible(false)
@@ -84,12 +76,11 @@ local function OpenElevatorMenu(elevatorId, floorId)
 end
 
 CreateThread(function()
-    TriggerServerEvent("n2_elevators:FetchElevators")
     while true do
         Wait(1000)
         local pedCoords = GetEntityCoords(PlayerPedId())
         nearbyElevators = {}
-        for k, v in ipairs(elevators) do
+        for k, v in ipairs(Config.Elevators) do
             for i, j in ipairs(v.locations) do
                 if #(pedCoords - j.dest.xyz) < 8.0 then
                     nearbyElevators[#nearbyElevators+1] = {
@@ -108,7 +99,7 @@ CreateThread(function()
         if not usingElevator and #nearbyElevators > 0 then
             local pedCoords = GetEntityCoords(PlayerPedId())
             for _, v in ipairs(nearbyElevators) do
-                local coords = elevators[v.eleId].locations[v.floorId].dest.xyz
+                local coords = Config.Elevators[v.eleId].locations[v.floorId].dest.xyz
                 DrawMarker(27, coords.x, coords.y, coords.z + 0.05, 0.0, 0.0, 0.0, 0.0, 180.0, 0.0, 1.5, 1.5, 1.5, 255, 255, 255, 180, false, false, 2, nil, nil, false)
                 if #(pedCoords - coords) < 2.0 then
                     DisplayHelpText("Press ~INPUT_CONTEXT~ to use the elevator.", true)

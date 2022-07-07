@@ -1,4 +1,11 @@
 Config = {}
+
+Config.MenuPosition = "right"
+Config.MenuPositions = {
+    ["left"] = {x = 0, y = 0},
+    ["right"] = {x = 1420, y = 0}
+}
+
 Config.Elevators = {
     {
         label = "Humane Labs",
